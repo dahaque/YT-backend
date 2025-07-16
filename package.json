@@ -1,0 +1,16 @@
+{
+  "name": "yt-backend",
+  "version": "1.0.0",
+  "description": "Backend for youtube project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Javascript",
+    "backend",
+    "Youtube"
+  ],
+  "author": "Sadiq Nazirul Haque",
+  "license": "ISC"
+}
