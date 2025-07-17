@@ -1,10 +1,29 @@
 import dotenv from "dotenv"
 import connectDB from "./db/index.js";
+import app from "./app.js";
+
 dotenv.config({
     path: './.env'
 })
 
-connectDB();
+
+const PORT = process.env.PORT || 4000;
+
+// Second way
+connectDB() // This is an async function so it'll return a promise when executed
+.then(() => {
+  app.on("erroe", (error) => {
+    console.log("ERR : ", error)
+    throw error
+  })
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on : ${PORT}`)
+  })
+})
+.catch((error) => {
+  console.log(`DB CONNECTION FAILED :${error}`)
+})
 
 //first way to connect DB
 /* (async () => {
