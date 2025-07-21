@@ -47,4 +47,16 @@ const userSchema = new mongoose.Schema(
     }
   }, {timestamps : true})
 
+ // encryption takes times that's why async function 
+userSchema.pre("save", async function(next){
+  if(this.isModified("password")){
+    this.password = bcrypt.hash(this.password, 10)
+  }
+  next();
+})
+
+userSchema.method.isPasswordCorrect = async function(password){
+ return await bcrypt.compare(password, this.password); // returns a boolean
+}
+
 export const User = mongoose.model("User", userSchema)
