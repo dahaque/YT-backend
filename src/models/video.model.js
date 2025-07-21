@@ -1,6 +1,6 @@
 import mongoose, {Schema} from "mongoose";
 
-import mongooseAggregatePaginate from " ";
+import mongooseAggregatePaginate from "mongoose-aggregate-paginate-v2";
 
 const videoSchema = new Schema(
     {
@@ -10,7 +10,7 @@ const videoSchema = new Schema(
         },
         thumbnail: {
             type: String, //cloudinary url
-            required: true  
+            required: true
         },
         title: {
             type: String, 
