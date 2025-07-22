@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 4000;
 // Second way
 connectDB() // This is an async function so it'll return a promise when executed
 .then(() => {
-  app.on("erroe", (error) => {
+  app.on("error", (error) => {
     console.log("ERR : ", error)
     throw error
   })
