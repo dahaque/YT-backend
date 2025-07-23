@@ -8,10 +8,8 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
       
       cb(null, file.originalname) // Not a good practice to save file name as the original name, because their 
-                                  // can be multiple files that can override each other with the same name.
+                                    // can be multiple files that can override each other with the same name.
     }
   })
   
-export const upload = multer({ 
-    storage, 
-})  
+export const upload = multer({ storage });
