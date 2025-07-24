@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
  // encryption takes times that's why async function 
 userSchema.pre("save", async function(next){
   if(this.isModified("password")){
-    this.password = bcrypt.hash(this.password, 10)
+    this.password = await bcrypt.hash(this.password, 10)
   }
   next();
 })
