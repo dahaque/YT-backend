@@ -1,6 +1,6 @@
-import {asyncHandler} from "../utils/asyncHandler.js"
-import {ApiError} from "../utils/ApiError.js"
-import {User} from "../models/user.model.js"
+import { asyncHandler } from "../utils/asyncHandler.js"
+import { ApiError } from "../utils/ApiError.js"
+import { User } from "../models/user.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import uploadOnCloudinary from "../utils/cloudinary.js"
 
@@ -16,8 +16,9 @@ const registerUser = asyncHandler( async (req, res) => {
   // check if user created
   // return response 
 
+ console.log(req.body) 
  const {email, fullname, password, username} = req.body
- console.log(`email : ${email}`);
+ console.log({ email, fullname, username, password }); 
  
  // basic checks 
  //  if (email === "") {
@@ -26,14 +27,14 @@ const registerUser = asyncHandler( async (req, res) => {
 
  // advance checks
  if ([email, fullname, password, username].some((field) =>
-    field.trim() === "")
+    !field || field?.trim() === "")
  ) {
    throw new ApiError(400, "All fields are required")
  }
 
  // checking if user already exists 
  // $or: finds either by username or email
- const existingUser = User.findOne({ $or: [{ username }, { email }] })
+ const existingUser = await User.findOne({ $or: [{ username }, { email }] })
  if (existingUser) {
   throw new ApiError(409, "User with this username or email already exists, try choosing another one!")
  }
@@ -73,8 +74,10 @@ if (!createdUser) {
   throw new ApiError(500, "Something went wrong while registering the user!")
 }
 
+const userReponse = createdUser.toObject()
+
 return res.status(201).json(
-  new ApiResponse(200, createdUser, "User registered successfully!")
+  new ApiResponse(200, userReponse, "User registered successfully!")
 )
 
 } )
