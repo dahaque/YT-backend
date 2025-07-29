@@ -8,7 +8,7 @@ const verifyJWT = asyncHandler( async (req, _, next) => {
    try {
     // Incase of mobile apps we won't get access tokens rather we will get headers
     // format of auth header - Authorization : Bearer <token>
-    const token = req.cookies?.accessToken || req.header("Authorization").replace("Bearer ", "")
+    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
  
     if(!token){
         throw new ApiError(401, "Unauthorized request!")
