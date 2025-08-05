@@ -20,10 +20,21 @@ userRouter.route("/login").post(loginUser)
 
 // secured routes
 userRouter.route("/logout").post(verifyJWT ,logoutUser)
+
 userRouter.route("/refresh-token").post(refreshAccessToken)
+
 userRouter.route("/change-password").post(verifyJWT, changePassword)
-userRouter.route("/current-user").post(verifyJWT, getCurrentuser)
 
+userRouter.route("/current-user").get(verifyJWT, getCurrentuser)
 
+userRouter.route("/update-account-details").patch(verifyJWT, updateAccoundDetails)
+
+userRouter.route("/update-avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
+
+userRouter.route("/update-cover-image").patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage)
+
+userRouter.route("/channel/:username").get(verifyJWT, getUserChannelProfile)
+
+userRouter.route("/watch-history").get(verifyJWT, getWatchHistory)
 
 export default userRouter
