@@ -4,6 +4,7 @@ import { User } from "../models/user.model.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import uploadOnCloudinary from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
+import mongoose from "mongoose"
 
 const generateAccessandRefreshToken = async function (userID) {
     try {
@@ -427,6 +428,55 @@ const getUserChannelProfile = asyncHandler ( async (req, res) => {
 
 } )
 
+const getWatchHistory = asyncHandler( async (req, res) => {
+    
+    const user = await User.aggregate([
+        {
+            $match : {
+                _id : new mongoose.Types.ObjectId(req.user?._id)
+            }
+        },
+        {
+            $lookup : {
+                from : "videos",
+                localField : "watchHistory",
+                foreignField : "_id",
+                as : "watchHistory",
+                pipeline : [
+                    {
+                        $lookup :{
+                            from : "users",
+                            localField : "owner",
+                            foreignField : "_id",
+                            as : "videoOwner",
+                            pipeline : [
+                                {
+                                    $project : {
+                                        fullname : 1,
+                                        username : 1,
+                                        avatar : 1
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields : {
+                            videoOwner : {
+                                $first : "$videoOwner" // only sending the first value of the array returned.
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user[0].watchHistory, "Watch history fetched!"))
+} )
+
 export { 
     registerUser,
     loginUser,
@@ -437,5 +487,6 @@ export {
     updateAccoundDetails,
     updateUserAvatar,
     updateUserCoverImage,
-    getUserChannelProfile
+    getUserChannelProfile,
+    getWatchHistory
 }
