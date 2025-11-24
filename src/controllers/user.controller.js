@@ -5,13 +5,13 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import {uploadOnCloudinary,  deleteFromCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
-import { deleteLocalFile } from "../utils/deleteLocalFile.js"
+import stringify from "fast-safe-stringify"
 
 const generateAccessandRefreshToken = async function (userID) {
     try {
-        const user = await User.findById(userID)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const user = await User.findById(userID);
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
 
         // add refresh token in DB and save
         user.refreshToken = refreshToken
@@ -173,7 +173,7 @@ const logoutUser = asyncHandler( async (req, res) => {
 		$unset : { 
 			refreshToken : 1 
 		}
-		},
+		},  
 		{
 			new : true // returns new updated value 
 		}
@@ -271,7 +271,7 @@ const updateAccountDetails = asyncHandler( async(req, res) => {
     const {fullname, email} = req.body;
 
     if (!fullname && !email) {
-        throw new ApiError(400, "All fields are reqired!")
+        throw new ApiError(400, "All fields are required!")
     }
 
     const user = User.findByIdAndUpdate(
@@ -285,11 +285,13 @@ const updateAccountDetails = asyncHandler( async(req, res) => {
         {
             new : true // returns newly saved info 
         }
-    ).select("-password")
+    ).select("-password").lean()
+
+    console.log(typeof user)    
 
     return res
     .status(200)
-    .json(new ApiResponse(200, user, "Account details updated successfully!"))
+    .json(new ApiResponse(200, "Account details updated successfully!"))
 } )
 
 const updateUserAvatar = asyncHandler( async(req, res) => {
