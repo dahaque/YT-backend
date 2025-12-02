@@ -146,7 +146,7 @@ const loginUser = asyncHandler( async (req, res, next) => {
 
     const {accessToken, refreshToken} = await generateAccessandRefreshToken(user._id)
 
-    const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken ")
 
     // These options make the cookies unmodifiable in frontend.
     const options = {
@@ -390,6 +390,7 @@ const getUserChannelProfile = asyncHandler ( async (req, res) => {
                 foreignField : "channel",
                 as : "subscribers"
             }
+            // got subscribers
         },
         {
             $lookup : {
@@ -407,7 +408,7 @@ const getUserChannelProfile = asyncHandler ( async (req, res) => {
                 channelsSubscribedToCount : {
                     $size : "$subscribedTo"
                 },
-                isSubsribed : {
+                isSubscribed : {
                     $cond : {
                         if : {$in: [req.user?._id, "$subscribers.subscriber"]},
                         then : true,
@@ -478,7 +479,7 @@ const getWatchHistory = asyncHandler( async (req, res) => {
                             }
                         }
                     }
-                ]
+                    ]
             }
         }
     ])
