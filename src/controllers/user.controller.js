@@ -287,7 +287,7 @@ const updateAccountDetails = asyncHandler( async(req, res) => {
         }
     ).select("-password").lean()
 
-    console.log(typeof user)    
+    // console.log(typeof user)    
 
     return res
     .status(200)

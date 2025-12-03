@@ -64,6 +64,75 @@ const publishAVideo = asyncHandler( async(req, res) => {
 
 } )
 
+const getVideoById = asyncHandler( async(req, res) => {
+    const { videoId } = req.params;
+
+    if(!videoId){
+        throw new ApiError(401, "Video ID is missing!")
+    }
+
+    const videoRes = await Video.findByIdAndUpdate(videoId, {
+        $inc: {
+            views: 1
+        },
+    },
+        { new: true }
+    )
+
+    if(!videoRes){
+        throw new ApiError(404, "Video isn't available")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, videoRes, "Video fetched successfully")
+    )
+} ) 
+
+const updateVideo = asyncHandler( async(req, res) => {
+    const { videoId } = req.params;
+
+    if(!videoId){
+        throw new ApiError(401, "Enter a valid videoId!")
+    }
+
+    const {title, description} = req.body;
+
+    const newThumbnailLocalPath = req.files?.thumbnail[0]?.path;
+
+    let newThumbnail = null;
+
+    if(newThumbnailLocalPath){
+       const newThumbnail = await uploadOnCloudinary(newThumbnailLocalPath)
+    }
+
+    // new way to update 
+    const updates = {}
+
+    if(title)
+        updates.title = title;
+
+    if(description)
+        updates.description = description;
+
+    if(newThumbnail)
+        updates.thumbnail = newThumbnail.url;
+    
+    const videoRes = await Video.findByIdAndUpdate(videoId, updates, { new: true})
+
+    if(!videoRes){
+        throw new ApiError(400, "update wasn't possible")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, videoRes, "Video updated successfully!")
+    )
+
+} )
+
 export {
     getAllVideo,
     publishAVideo
