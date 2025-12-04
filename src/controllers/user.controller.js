@@ -258,6 +258,9 @@ const changePassword = asyncHandler( async (req, res) => {
     )
 }) 
 
+//forget password
+
+
 const getCurrentuser = asyncHandler( async (req, res) => {
     return res
     .status(200)
