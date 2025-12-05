@@ -334,18 +334,25 @@ const resetPassword = asyncHandler( async(req, res) => {
         throw new ApiError(404, "no user found!")
     }
 
-    const newUser = User.findByIdAndUpdate(user._id, { 
-        $set : {
-            password : newPassword,
-            token : ""
-        }
-    }, {new : true})
+    // BAD CODE DOESN'T SAVE THE HASHED PASSWORD        
+    // const newUser = await User.findByIdAndUpdate(user._id, {
+    //     $set: {
+    //         password: newPassword, token: ""
+    //     }
+    // }, { new: true })
 
-    if(!newUser){
+    // await newUser.save({ validateBeforeSave : false } );
+
+    user.password = newPassword;
+    user.token = ''
+
+    await user.save( {validateBeforeSave : false} )
+
+    if(!user){
         throw new ApiError(401, "Password was not changed!")
     }
 
-    console.log(newUser.token);
+    console.log(user.token);
     
     return res
     .status(200)
