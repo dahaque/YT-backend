@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { 
+  forgetPassword,
+  resetPassword,
   changePassword, 
   getCurrentuser, 
   loginUser, 
@@ -31,10 +33,15 @@ userRouter.route("/register").post(upload.fields([
 
 userRouter.route("/login").post(loginUser)
 
+userRouter.route("/refresh-token").post(refreshAccessToken)
+
+userRouter.route("/forgot-password").post(forgetPassword)
+
+userRouter.route("/reset-password").get(resetPassword)
+
+
 // secured routes
 userRouter.route("/logout").post(verifyJWT ,logoutUser)
-
-userRouter.route("/refresh-token").post(refreshAccessToken)
 
 userRouter.route("/change-password").post(verifyJWT, changePassword)
 

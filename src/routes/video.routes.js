@@ -25,6 +25,12 @@ videoRouter.route("/publish").post(verifyJWT, upload.fields([
 
 videoRouter.route("/get-all-videos").get(verifyJWT, getAllVideo);   
 
+videoRouter.route("/get-video").get(verifyJWT, getVideoById);   
+
+videoRouter.route("/update-video").post(verifyJWT, updateVideo);
+
+videoRouter.route("/toggle-publish-status").post(verifyJWT, togglePublishStatus);
+
 videoRouter.route("/delete-video").post(verifyJWT, deleteVideo);    
 
 export default videoRouter;    

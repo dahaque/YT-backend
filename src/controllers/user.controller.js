@@ -5,7 +5,8 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 import {uploadOnCloudinary,  deleteFromCloudinary } from "../utils/cloudinary.js"
 import jwt from "jsonwebtoken"
 import mongoose from "mongoose"
-import stringify from "fast-safe-stringify"
+import nodemailer from "nodemailer";
+import Randomstring from "randomstring"
 
 const generateAccessandRefreshToken = async function (userID) {
     try {
@@ -259,7 +260,99 @@ const changePassword = asyncHandler( async (req, res) => {
 }) 
 
 //forget password
+const sendResetPasswordMail = asyncHandler( async(fullname, email, token) => {
+    const transporter = nodemailer.createTransport({
+        host : 'smtp.gmail.com',
+        port : 587,
+        secure : false,
+        requireTLS : true,
+        auth : {
+            user : process.env.emailUser,
+            pass : process.env.emailPassword
+        }
+    });
 
+    const mailOptions = {
+        from : process.env.emailUser,
+        to : email,
+        subject : 'To Reset your Wetube password',
+        html : '<p>Hey '+fullname+', Please copy this link and <a href = "http://localhost:8000/api/v1/users/reset-password?token='+token+'"> reset your password</a> </p>'
+    }
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if(error){
+            console.log(error);
+        }else{
+            console.log("Mail has been sent!", info.response)
+        }
+    })
+} )
+
+const forgetPassword = asyncHandler( async(req, res) => {
+    const { email } = req.body;
+
+    if(!email){
+        throw new ApiError(401, "No email found!")
+    }
+
+    const userData = await User.findOne({email});
+
+    if (!userData) {
+        throw new ApiError(404, "User not found!")
+    }
+
+    const ranString = Randomstring.generate();
+    const data = await User.updateOne({email}, {
+        $set :{
+            token : ranString
+        }
+    })
+    res.status(200).json(new ApiResponse(200, "Please check your email inbox to reset your password!"))
+    sendResetPasswordMail(userData.fullname, email, ranString);
+
+
+} )
+
+const resetPassword = asyncHandler( async(req, res) => { 
+    const {token} = req.query;
+
+    const {password} = req.body
+
+    if(!password){
+        throw new ApiError(400, "Password is required!")
+    }
+
+    const newPassword = password;
+
+    if (!token) {
+        throw new ApiError(404, "no token found!")
+    }
+
+    const user = await User.findOne({ token })
+
+    if (!user) {
+        throw new ApiError(404, "no user found!")
+    }
+
+    const newUser = User.findByIdAndUpdate(user._id, { 
+        $set : {
+            password : newPassword,
+            token : ""
+        }
+    }, {new : true})
+
+    if(!newUser){
+        throw new ApiError(401, "Password was not changed!")
+    }
+
+    console.log(newUser.token);
+    
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, "Password reset successfully !")
+    )
+})
 
 const getCurrentuser = asyncHandler( async (req, res) => {
     return res
@@ -498,6 +591,8 @@ export {
     logoutUser,
     refreshAccessToken,
     changePassword,
+    forgetPassword,
+    resetPassword,
     getCurrentuser,
     updateAccountDetails,
     updateUserAvatar,
